@@ -1,0 +1,17 @@
+<package>
+  <description brief="laser_refinery">
+
+     laser_refinery
+
+  </description>
+  <author>Zhang Xunkai</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/laser_refinery</url>
+  <depend package="roscpp"/>
+  <depend package="nodelet"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
