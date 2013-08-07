@@ -5,71 +5,43 @@
 #include <cstdio>
 #include <cstring>
 
-#include "laser_scan_matcher/get_contour2.h"
-#include "laser_scan_matcher/get_contour.h"
+#include "get_contour2.h"
 
 using namespace std;
 
 /* ros messages */
-ros::Subscriber scan_sub;
-ros::Publisher scan_pub1, scan_pub2;
+ros::Subscriber scan_raw;
+ros::Publisher scan_refined;
 
 /* extract contours parameters */
 double adjacentAcceptDistance  = 0.03;
 double maxJoinDistance         = 15;
-double maxSkipPoints           = 4;
+int    maxSkipPoints           = 4;
+int    endTrimPoints           = 3;
 double startContourMaxDistance = 0.2;
 double maxDistanceRatio        = 5;
 double alwaysAcceptDistance    = 0.05;
 double minPointsPerContour     = 20;
 
 /* contour extractor */
-contour_extractor contour_handler;
-contour_extractor_od contour_handler_od;
+ContourExtractor refinery;
 
-int callbackTime = 0;
 void scanCallback(const sensor_msgs::LaserScan msg)
 {
-    /* save as txt */
-    callbackTime++;
-    char fn[100] = "";
-    sprintf(fn, "/home/badpoet/bag2txt/square_raw/scan_%06d", callbackTime);
-    FILE* saveFile = fopen(fn, "w");
-
-    int n = msg.ranges.size();
-    for (int i = 0; i < n; i++)
-        fprintf(saveFile, "%.6f\n", msg.ranges[i]);
-    fclose(saveFile);
-
     /* publish contour msg */
-    contour_handler_od.cmpt_contours(msg);
-    scan_pub1.publish(contour_handler_od.get_contour_msg());
-    contour_handler.cmpt_contours(msg);
-    sensor_msgs::LaserScan msg2 = contour_handler.get_contour_msg();
-    scan_pub2.publish(msg2);
-
-    sprintf(fn, "/home/badpoet/bag2txt/data1/scan_%06d", callbackTime);
-    saveFile = fopen(fn, "w");
-
-    n = msg2.ranges.size();
-    for (int i = 0; i < n; i++)
-        fprintf(saveFile, "%.6f\n", msg2.ranges[i]);
-    fclose(saveFile);
+    refinery.compute_contours(msg);
+    scan_refined.publish(refinery.get_contour_msg());
 }
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "scan_handler");
+    ros::init(argc, argv, "laser_refinery");
     ros::NodeHandle nh;
 
-    scan_sub = nh.subscribe<sensor_msgs::LaserScan>("scan", 100, scanCallback);
-    scan_pub1 = nh.advertise<sensor_msgs::LaserScan>("scan1", 100);
-    scan_pub2 = nh.advertise<sensor_msgs::LaserScan>("scan2", 100);
+    scan_raw = nh.subscribe<sensor_msgs::LaserScan>("scan", 100, scanCallback);
+    scan_refined = nh.advertise<sensor_msgs::LaserScan>("scan2", 100);
 
-    contour_handler.set_params(maxSkipPoints,adjacentAcceptDistance,maxJoinDistance,
-    startContourMaxDistance,minPointsPerContour,maxDistanceRatio,alwaysAcceptDistance);
-    //contour_handler2.set_params(maxSkipPoints,adjacentAcceptDistance,maxJoinDistance,
-    //startContourMaxDistance,minPointsPerContour,maxDistanceRatio,alwaysAcceptDistance);
+    refinery.set_params(maxSkipPoints, endTrimPoints, adjacentAcceptDistance, maxJoinDistance, startContourMaxDistance, minPointsPerContour, maxDistanceRatio, alwaysAcceptDistance);
 
     ros::spin();
 }
