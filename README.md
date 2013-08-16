@@ -34,5 +34,5 @@ The algorithm is only test on ROS-fuerte.
 The default parameters in `main.cpp` performed well when using a
 R311-HOKUYO-LASER2 hokuyo laser sensor indoors.
 
-This package was used by THRONE (The time of Tsinghua Univ. in IARC 2013),
+This package was used by THRONE (The team of Tsinghua Univ. in IARC 2013),
 who was the only team completed IARC Mission 6.
