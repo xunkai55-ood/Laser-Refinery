@@ -4,8 +4,7 @@ Laser-Refinery
 Overview
 -----------------------------------
 
-Laser scan refinery. The package contains can be used for cutting some bad points 
-in laser scan data, to avoid potential accidents when you processing them.
+Laser scan refinery. The package contains can be used for cutting some bad points in laser scan data, to avoid potential accidents when you processing them.
 
 Installing
 -----------------------------------
@@ -27,8 +26,11 @@ More info
 -----------------------------------
 
 Only effective when laser data is polar sorted.
+
 The package use a fast linear algorithm.
+
 The algorithm is only test on ROS-fuerte.
+
 The default parameters in `main.cpp` performed well when using a
 R311-HOKUYO-LASER2 hokuyo laser sensor indoors.
 
